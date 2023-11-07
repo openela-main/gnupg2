@@ -1,0 +1,42 @@
+From c4436ebfa58f219190f1244928001b4293293343 Mon Sep 17 00:00:00 2001
+From: Jakub Jelen <jjelen@redhat.com>
+Date: Tue, 12 Apr 2022 16:26:58 +0200
+Subject: [PATCH GnuPG] agent: Ignore MD5 Fingerprints for ssh keys
+
+--
+* agent/command-ssh.c (add_control_entry): Ignore failure of the MD5
+  digest
+
+Signed-off-by: Jakub Jelen <jjelen@redhat.com>
+---
+ agent/command-ssh.c | 6 ++++--
+ 1 file changed, 4 insertions(+), 2 deletions(-)
+
+diff --git a/agent/command-ssh.c b/agent/command-ssh.c
+index a7784e728..46821e3c8 100644
+--- a/agent/command-ssh.c
++++ b/agent/command-ssh.c
+@@ -1095,8 +1095,9 @@ add_control_entry (ctrl_t ctrl, ssh_key_type_spec_t *spec,
+       time_t atime = time (NULL);
+ 
+       err = ssh_get_fingerprint_string (key, GCRY_MD_MD5, &fpr_md5);
++      /* ignore the errors as MD5 is not available in FIPS mode */
+       if (err)
+-        goto out;
++        fpr_md5 = NULL;
+ 
+       err = ssh_get_fingerprint_string (key, GCRY_MD_SHA256, &fpr_sha256);
+       if (err)
+@@ -1113,7 +1114,8 @@ add_control_entry (ctrl_t ctrl, ssh_key_type_spec_t *spec,
+                spec->name,
+                1900+tp->tm_year, tp->tm_mon+1, tp->tm_mday,
+                tp->tm_hour, tp->tm_min, tp->tm_sec,
+-               fpr_md5, fpr_sha256, hexgrip, ttl, confirm? " confirm":"");
++               fpr_md5? fpr_md5:"", fpr_sha256, hexgrip, ttl,
++               confirm? " confirm":"");
+ 
+     }
+  out:
+-- 
+2.39.2
+
