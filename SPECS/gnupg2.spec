@@ -7,7 +7,7 @@
 Summary: Utility for secure communication and data storage
 Name:    gnupg2
 Version: 2.3.3
-Release: 2%{?dist}
+Release: 4%{?dist}
 
 License: GPLv3+
 Source0: https://gnupg.org/ftp/gcrypt/%{?pre:alpha/}gnupg/gnupg-%{version}%{?pre}.tar.bz2
@@ -31,6 +31,12 @@ Patch30: gnupg-2.2.21-coverity.patch
 Patch31: gnupg-2.3.1-revert-default-eddsa.patch
 # Revert default EdDSA key types
 Patch32: gnupg-2.3.3-CVE-2022-34903.patch
+# Fix AEAD packet construction
+# https://dev.gnupg.org/T5856
+Patch34: gnupg-2.3.3-aead-packet.patch
+# Fix ssh-agent behavior in FIPS mode
+# https://dev.gnupg.org/T5929
+Patch35: gnupg-2.3.3-ssh-fips.patch
 
 
 URL:     https://www.gnupg.org/
@@ -116,6 +122,8 @@ to the base GnuPG package
 %patch30 -p1 -b .coverity
 %patch31 -p1 -R -b .eddsa
 %patch32 -p1 -b .CVE-2022-34903
+%patch34 -p1 -b .aead
+%patch35 -p1 -b .ssh-fips
 
 # pcsc-lite library major: 0 in 1.2.0, 1 in 1.2.9+ (dlopen()'d in pcsc-wrapper)
 # Note: this is just the name of the default shared lib to load in scdaemon,
@@ -229,6 +237,14 @@ make -k check
 
 
 %changelog
+* Wed Apr 19 2023 Jakub Jelen <jjelen@redhat.com> - 2.3.3-4
+- Revert marking the SHA-1 digest as weak (#2184640)
+
+* Thu Mar 30 2023 Jakub Jelen <jjelen@redhat.com> - 2.3.3-3
+- Mark SHA-1 digest as weak to follow SHA-1 disablement in RHEL9 (#2070722)
+- Fix interaction with SSH by not requiring the MD5 digest (#2073567)
+- Fix creation of AEAD packets (#2128058)
+
 * Wed Aug 03 2022 Jakub Jelen <jjelen@redhat.com> - 2.3.3-2
 - Fix CVE-2022-34903 (#2108449)
 
