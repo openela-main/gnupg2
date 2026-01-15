@@ -7,7 +7,7 @@
 Summary: Utility for secure communication and data storage
 Name:    gnupg2
 Version: 2.3.3
-Release: 4%{?dist}
+Release: 5%{?dist}
 
 License: GPLv3+
 Source0: https://gnupg.org/ftp/gcrypt/%{?pre:alpha/}gnupg/gnupg-%{version}%{?pre}.tar.bz2
@@ -37,7 +37,8 @@ Patch34: gnupg-2.3.3-aead-packet.patch
 # Fix ssh-agent behavior in FIPS mode
 # https://dev.gnupg.org/T5929
 Patch35: gnupg-2.3.3-ssh-fips.patch
-
+# https://github.com/gpg/gnupg/commit/115d138ba599328005c5321c0ef9f00355838ca9
+Patch36: gnupg-2.3.3-memcpy.patch
 
 URL:     https://www.gnupg.org/
 
@@ -124,6 +125,7 @@ to the base GnuPG package
 %patch32 -p1 -b .CVE-2022-34903
 %patch34 -p1 -b .aead
 %patch35 -p1 -b .ssh-fips
+%patch36 -p1 -b .memcpy
 
 # pcsc-lite library major: 0 in 1.2.0, 1 in 1.2.9+ (dlopen()'d in pcsc-wrapper)
 # Note: this is just the name of the default shared lib to load in scdaemon,
@@ -237,6 +239,9 @@ make -k check
 
 
 %changelog
+* Tue Jan 13 2026 Jakub Jelen <jjelen@redhat.com> - 2.3.3-5
+- Fix CVE-2025-68973 (gpg.fail/memcpy)
+
 * Wed Apr 19 2023 Jakub Jelen <jjelen@redhat.com> - 2.3.3-4
 - Revert marking the SHA-1 digest as weak (#2184640)
 
