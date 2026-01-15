@@ -3,7 +3,7 @@
 Summary: Utility for secure communication and data storage
 Name:    gnupg2
 Version: 2.4.5
-Release: 2%{?dist}
+Release: 3%{?dist}
 
 License: CC0-1.0 AND GPL-2.0-or-later AND GPL-3.0-or-later AND LGPL-2.1-or-later AND LGPL-3.0-or-later AND (BSD-3-Clause OR LGPL-3.0-or-later OR GPL-2.0-or-later) AND CC-BY-4.0 AND MIT
 Source0: https://gnupg.org/ftp/gcrypt/%{?pre:alpha/}gnupg/gnupg-%{version}%{?pre}.tar.bz2
@@ -32,6 +32,8 @@ Patch33: gnupg-2.4.3-restore-systemd-sockets.patch
 Patch34: gnupg-2.4.5-revert-default-eddsa.patch
 # https://dev.gnupg.org/T7129
 Patch35: gnupg-2.4.5-sast.patch
+# https://github.com/gpg/gnupg/commit/115d138ba599328005c5321c0ef9f00355838ca9
+Patch36: gnupg-2.4.5-memcpy.patch
 
 URL:     https://www.gnupg.org/
 
@@ -67,12 +69,12 @@ BuildRequires: swtpm
 Requires: libgcrypt >= 1.9.1
 Requires: libgpg-error >= 1.46
 
-Recommends: pinentry
+Suggests: pinentry
 
-Recommends: gnupg2-smime
+Suggests: gnupg2-smime
 
 # for USB smart card support
-Recommends: pcsc-lite-ccid
+Suggests: pcsc-lite-ccid
 
 # pgp-tools, perl-GnuPG-Interface requires 'gpg' (not sure why) -- Rex
 Provides: gpg = %{version}-%{release}
@@ -127,6 +129,7 @@ to the base GnuPG package
 %patch 33 -p1 -b .restore-systemd-sockets
 %patch 34 -p1 -R -b .eddsa
 %patch 35 -p1 -b .sast
+%patch 36 -p1 -b .memcpy
 
 # pcsc-lite library major: 0 in 1.2.0, 1 in 1.2.9+ (dlopen()'d in pcsc-wrapper)
 # Note: this is just the name of the default shared lib to load in scdaemon,
@@ -234,6 +237,10 @@ make -k check
 
 
 %changelog
+* Tue Jan 13 2026 Jakub Jelen <jjelen@redhat.com> - 2.4.5-3
+- Fix CVE-2025-68973 (gpg.fail/memcpy)
+- Avoid weak dependencies
+
 * Tue Oct 29 2024 Troy Dawson <tdawson@redhat.com> - 2.4.5-2
 - Bump release for October 2024 mass rebuild:
   Resolves: RHEL-64018
