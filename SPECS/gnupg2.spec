@@ -3,7 +3,7 @@
 Summary: Utility for secure communication and data storage
 Name:    gnupg2
 Version: 2.2.20
-Release: 3%{?dist}
+Release: 4%{?dist}
 
 License: GPLv3+
 Source0: ftp://ftp.gnupg.org/gcrypt/%{?pre:alpha/}gnupg/gnupg-%{version}%{?pre}.tar.bz2
@@ -26,7 +26,8 @@ Patch22: gnupg-2.2.18-gpg-accept-subkeys-with-a-good-revocation-but-no-self-sig.
 Patch23: gnupg-2.2.20-CVE-2022-34903.patch
 # Fixes for issues found in Coverity scan - reported upstream
 Patch30: gnupg-2.2.20-coverity.patch
-
+# https://github.com/gpg/gnupg/commit/115d138ba599328005c5321c0ef9f00355838ca9
+Patch36: gnupg-2.3.3-memcpy.patch
 
 URL:     http://www.gnupg.org/
 
@@ -110,6 +111,7 @@ to the base GnuPG package
 %patch23 -p1 -b .CVE-2022-34903
 
 %patch30 -p1 -b .coverity
+%patch36 -p1 -b .memcpy
 
 # pcsc-lite library major: 0 in 1.2.0, 1 in 1.2.9+ (dlopen()'d in pcsc-wrapper)
 # Note: this is just the name of the default shared lib to load in scdaemon,
@@ -222,6 +224,9 @@ make -k check
 
 
 %changelog
+* Tue Jan 13 2026 Jakub Jelen <jjelen@redhat.com> - 2.2.20-4
+- Fix CVE-2025-68973 (gpg.fail/memcpy)
+
 * Wed Aug 03 2022 Jakub Jelen <jjelen@redhat.com> - 2.2.20-3
 - Fix CVE-2022-34903 (#2108447)
 
