@@ -3,7 +3,7 @@
 Summary: Utility for secure communication and data storage
 Name:    gnupg2
 Version: 2.4.5
-Release: 3%{?dist}
+Release: 4%{?dist}
 
 License: CC0-1.0 AND GPL-2.0-or-later AND GPL-3.0-or-later AND LGPL-2.1-or-later AND LGPL-3.0-or-later AND (BSD-3-Clause OR LGPL-3.0-or-later OR GPL-2.0-or-later) AND CC-BY-4.0 AND MIT
 Source0: https://gnupg.org/ftp/gcrypt/%{?pre:alpha/}gnupg/gnupg-%{version}%{?pre}.tar.bz2
@@ -34,6 +34,9 @@ Patch34: gnupg-2.4.5-revert-default-eddsa.patch
 Patch35: gnupg-2.4.5-sast.patch
 # https://github.com/gpg/gnupg/commit/115d138ba599328005c5321c0ef9f00355838ca9
 Patch36: gnupg-2.4.5-memcpy.patch
+# CVE-2026-24882: Stack-based buffer overflow in tpm2daemon allows arbitrary code execution
+# https://dev.gnupg.org/T8045
+Patch37:  gnupg-2.4.5-tpm2daemon.patch
 
 URL:     https://www.gnupg.org/
 
@@ -130,6 +133,7 @@ to the base GnuPG package
 %patch 34 -p1 -R -b .eddsa
 %patch 35 -p1 -b .sast
 %patch 36 -p1 -b .memcpy
+%patch 37 -p1 -b .tpm2d
 
 # pcsc-lite library major: 0 in 1.2.0, 1 in 1.2.9+ (dlopen()'d in pcsc-wrapper)
 # Note: this is just the name of the default shared lib to load in scdaemon,
@@ -237,6 +241,9 @@ make -k check
 
 
 %changelog
+* Fri Feb 06 2026 Jakub Jelen <jjelen@redhat.com> - 2.4.5-4
+- Fix CVE-2026-24882 (tpm2daemon buffer overflow)
+
 * Tue Jan 13 2026 Jakub Jelen <jjelen@redhat.com> - 2.4.5-3
 - Fix CVE-2025-68973 (gpg.fail/memcpy)
 - Avoid weak dependencies
